@@ -28,6 +28,16 @@ public class Book {
     private String author;
     private Date publishedDate;
 
+    public Book() {
+    }
+
+    public Book(@ISBN(message = "ISBN must be a valid ISBN number") String isbn, @NotNull String title, @NotNull String author, Date publishedDate) {
+        this.isbn = isbn;
+        this.title = title;
+        this.author = author;
+        this.publishedDate = publishedDate;
+    }
+
     public String getIsbn() {
         return isbn;
     }

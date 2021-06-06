@@ -1,10 +1,13 @@
 package com.sana.crudnkafkademo.controller;
 
+import com.sana.crudnkafkademo.exception.BookIsbnNotFoundException;
+import com.sana.crudnkafkademo.exception.BookNotFoundException;
 import com.sana.crudnkafkademo.model.Book;
 import com.sana.crudnkafkademo.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,8 +30,9 @@ public class BookController {
      * @return all listed books
      */
     @GetMapping("/all")
-    private List<Book> getAllbook() {
-        return bookService.getAllbook();
+    private ResponseEntity<List<Book>> getAllBook() throws BookNotFoundException {
+        List<Book> books = bookService.getAllbook();
+        return ResponseEntity.status(HttpStatus.OK).body(books);
     }
 
     /**
@@ -37,8 +41,9 @@ public class BookController {
      * @return single book
      */
     @GetMapping("/isbn/{isbn}")
-    private Book getbookByIsbn(@PathVariable("isbn") String isbn) {
-        return bookService.getbookByIsbn(isbn);
+    private ResponseEntity<Book> getBookByIsbn(@PathVariable("isbn") String isbn){
+        Book book = bookService.getbookByIsbn(isbn);
+        return ResponseEntity.status(HttpStatus.OK).body(book);
     }
 
     /**
@@ -48,8 +53,9 @@ public class BookController {
      * @return list of books
      */
     @GetMapping("/title/{title}")
-    private List<Book> getbookByTitle(@PathVariable("title") String title) {
-        return bookService.getBookByTitle(title.toUpperCase());
+    private ResponseEntity<List<Book>> getBookByTitle(@PathVariable("title") String title) throws BookNotFoundException {
+        List<Book> books = bookService.getBookByTitle(title.toUpperCase());
+        return ResponseEntity.status(HttpStatus.OK).body(books);
     }
 
     /**
@@ -59,8 +65,9 @@ public class BookController {
      * @return list of books
      */
     @GetMapping("/author/{author}")
-    private List<Book> getbookByAuthor(@PathVariable("author") String author) {
-        return bookService.getBookByAuthor(author.toUpperCase());
+    private ResponseEntity<List<Book>> getBookByAuthor(@PathVariable("author") String author) throws BookNotFoundException {
+        List<Book> books = bookService.getBookByAuthor(author.toUpperCase());
+        return ResponseEntity.status(HttpStatus.OK).body(books);
     }
 
     /**
@@ -68,7 +75,7 @@ public class BookController {
      * @param isbn of deleted book
      */
     @DeleteMapping("/delete/{isbn}")
-    private void deleteBook(@PathVariable("isbn") String isbn) {
+    private void deleteBook(@PathVariable("isbn") String isbn) throws BookNotFoundException {
         bookService.delete(isbn);
         kafkaTemplate.send(TOPIC, "Book deleted with ISBN: " + isbn);
     }
@@ -79,9 +86,23 @@ public class BookController {
      * @return ISBN number of the saved book
      */
     @PostMapping("/save")
-    private String savebook(@Valid @RequestBody Book book) {
+    private ResponseEntity<String> saveBook(@Valid @RequestBody Book book) {
         bookService.saveOrUpdate(book);
         kafkaTemplate.send(TOPIC, "New Book Saved: " + book.toString());
-        return book.getIsbn();
+        return ResponseEntity.status(HttpStatus.OK).body("Saved book ISBN:" + book.getIsbn());
+
     }
+
+    /**
+     * This API update a book by ISBN
+     * @param book
+     * @return ResponseEntity
+     * @throws BookIsbnNotFoundException
+     */
+    @PutMapping("/update")
+    ResponseEntity<Void> updateBook(@RequestBody Book book)throws BookIsbnNotFoundException {
+        bookService.updateBook(book);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }    
