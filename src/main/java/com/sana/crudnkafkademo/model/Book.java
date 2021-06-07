@@ -15,7 +15,7 @@ import java.util.Date;
  *
  */
 @Entity
-@Table(name = "books")
+@Table(name = "t_book")
 public class Book {
     @Id
     @ISBN (message = "ISBN must be a valid ISBN number")
@@ -79,4 +79,14 @@ public class Book {
                 ", publishedDate=" + publishedDate +
                 '}';
     }
+
+    public String toJSON() {
+        return "{" +
+                "\"isbn\":\"" + isbn + '\"' +
+                ",\"title\":\"" + title + '\"' +
+                ",\"author\":\"" + author + '\"' +
+                ",\"publishedDate\":\"" + publishedDate +
+                "\"}";
+    }
+
 }

@@ -16,7 +16,7 @@ public interface BookService {
 
     void delete(String isbn) throws BookNotFoundException;
 
-    void saveOrUpdate(Book book);
+    void save(Book book);
 
     List<Book> getBookByTitle(String title) throws BookNotFoundException;
 

@@ -3,9 +3,11 @@ package com.sana.crudnkafkademo.repository;
 import com.sana.crudnkafkademo.model.Book;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public interface BooksRepository extends CrudRepository<Book, String> {
 
     /**

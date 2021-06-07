@@ -7,7 +7,6 @@ import com.sana.crudnkafkademo.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -20,10 +19,6 @@ public class BookController {
     @Autowired
     BookService bookService;
 
-    @Autowired
-    KafkaTemplate<String,String> kafkaTemplate;
-
-    private static final String TOPIC = "Book-Transaction-History";
 
     /**
      * This API will return all the books listed
@@ -77,7 +72,7 @@ public class BookController {
     @DeleteMapping("/delete/{isbn}")
     private void deleteBook(@PathVariable("isbn") String isbn) throws BookNotFoundException {
         bookService.delete(isbn);
-        kafkaTemplate.send(TOPIC, "Book deleted with ISBN: " + isbn);
+//        kafkaTemplate.send(TOPIC, "Book deleted with ISBN: " + isbn);
     }
 
     /**
@@ -87,8 +82,7 @@ public class BookController {
      */
     @PostMapping("/save")
     private ResponseEntity<String> saveBook(@Valid @RequestBody Book book) {
-        bookService.saveOrUpdate(book);
-        kafkaTemplate.send(TOPIC, "New Book Saved: " + book.toString());
+        bookService.save(book);
         return ResponseEntity.status(HttpStatus.OK).body("Saved book ISBN:" + book.getIsbn());
 
     }
